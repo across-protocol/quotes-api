@@ -16,7 +16,7 @@
     "@uma/common" "^2.17.0"
     hardhat "^2.9.3"
 
-"@across-protocol/constants-v2@^1.0.19", "@across-protocol/constants-v2@^1.0.20":
+"@across-protocol/constants-v2@^1.0.19", "@across-protocol/constants-v2@^1.0.20", "@across-protocol/constants-v2@^1.0.24":
   version "1.0.24"
   resolved "https://registry.yarnpkg.com/@across-protocol/constants-v2/-/constants-v2-1.0.24.tgz#30b7dd898ff6d4848717fd6cf393a10f1f2f40b0"
   integrity sha512-lDu6rMoTMUolGHwUnX/YkeMcIKB1avd6MnBcyfa4z5DkuF0HCo+7Mbviri2LXW0SOTg/pE26Dvfr1P+HmBUD9A==
