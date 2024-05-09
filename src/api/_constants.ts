@@ -8,7 +8,8 @@ export const CHAIN_IDs = constants.CHAIN_IDs;
 // entries in our constants package. See https://github.com/across-protocol/constants-v3/pull/28
 // for more details. Until the entry `USDC` is updated with the values of `_USDC`, we override the
 // entry locally.
-let { USDC, _USDC, ...tokenSymbols } = constants.TOKEN_SYMBOLS_MAP;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { USDC, _USDC, ...tokenSymbols } = constants.TOKEN_SYMBOLS_MAP;
 export const TOKEN_SYMBOLS_MAP = {
   ...tokenSymbols,
   USDC: _USDC,

@@ -43,12 +43,10 @@ const handler = async (
   try {
     assert(query, BuildDepositTxQueryParamsSchema);
 
-    let {
+    const {
       amount: amountInput,
-      token,
       destinationChainId: destinationChainIdInput,
       originChainId: originChainIdInput,
-      recipient,
       relayerFeePct: relayerFeePctInput,
       // Note, that the value of `quoteTimestamp` query param needs to be taken directly as returned by the
       // `GET /api/suggested-fees` endpoint. This is why we don't floor the timestamp value here.
@@ -58,6 +56,8 @@ const handler = async (
       referrer,
       isNative: isNativeBoolStr,
     } = query;
+
+    let { token, recipient } = query;
 
     recipient = ethers.utils.getAddress(recipient);
     token = ethers.utils.getAddress(token);

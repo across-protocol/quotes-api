@@ -61,14 +61,9 @@ const handler = async (
 
     assert(query, SuggestedFeesQueryParamsSchema);
 
-    let {
-      amount: amountInput,
-      timestamp,
-      skipAmountLimit,
-      recipient,
-      relayer,
-      message,
-    } = query;
+    const { amount: amountInput, timestamp, skipAmountLimit, message } = query;
+
+    let { recipient, relayer } = query;
 
     const {
       l1Token,
@@ -134,7 +129,7 @@ const handler = async (
       : DEFAULT_QUOTE_BLOCK_BUFFER;
 
     // If the caller did not supply a quote timestamp, generate one from the latest block number minus buffer.
-    let parsedTimestamp = Number(timestamp);
+    const parsedTimestamp = Number(timestamp);
     if (isNaN(parsedTimestamp)) {
       // Round block number. Assuming that depositors use this timestamp as the `quoteTimestamp` will allow relayers
       // to take advantage of cached block numbers for timestamp values when computing LP fee %'s. Currently the relayer is assumed

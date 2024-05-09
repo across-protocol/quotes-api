@@ -133,7 +133,7 @@ export const log = (
         },
       }
     : data;
-  let message = JSON.stringify(dataWithReplacedError, null, 4);
+  const message = JSON.stringify(dataWithReplacedError, null, 4);
   // Fire and forget. we don't wait for this to finish.
   gcpLogger
     .write(
@@ -219,13 +219,13 @@ export const validateChainAndTokenParams = (
     destinationChainId: string;
   }>,
 ) => {
-  let {
+  const {
     token,
-    inputToken: inputTokenAddress,
-    outputToken: outputTokenAddress,
     originChainId,
     destinationChainId: _destinationChainId,
   } = queryParams;
+  let { inputToken: inputTokenAddress, outputToken: outputTokenAddress } =
+    queryParams;
 
   if (!_destinationChainId) {
     throw new InputError("Query param 'destinationChainId' must be provided");
@@ -397,7 +397,7 @@ export const getRouteDetails = (
 
 const _getTokenByAddress = (tokenAddress: string, chainId?: number) => {
   const [, token] =
-    Object.entries(TOKEN_SYMBOLS_MAP).find(([_symbol, { addresses }]) =>
+    Object.entries(TOKEN_SYMBOLS_MAP).find(([, { addresses }]) =>
       chainId
         ? addresses[chainId]?.toLowerCase() === tokenAddress.toLowerCase()
         : Object.values(addresses).some(
@@ -412,7 +412,7 @@ const _getChainIdsOfToken = (
   token: (typeof TOKEN_SYMBOLS_MAP)[keyof typeof TOKEN_SYMBOLS_MAP],
 ) => {
   const chainIds = Object.entries(token.addresses).filter(
-    ([_, address]) => address.toLowerCase() === tokenAddress.toLowerCase(),
+    ([, address]) => address.toLowerCase() === tokenAddress.toLowerCase(),
   );
   return chainIds.map(([chainId]) => Number(chainId));
 };
@@ -492,7 +492,7 @@ export const getHubPoolClient = () => {
     {
       provider: infuraProvider(HUB_POOL_CHAIN_ID),
     },
-    (_, __) => {}, // Dummy function that does nothing and is needed to construct this client.
+    () => {}, // Dummy function that does nothing and is needed to construct this client.
   );
 };
 
@@ -650,7 +650,7 @@ export const getRelayerFeeCalculator = (destinationChainId: number) => {
  */
 export const getTokenSymbol = (tokenAddress: string): string => {
   const symbol = Object.entries(TOKEN_SYMBOLS_MAP).find(
-    ([_symbol, { addresses }]) =>
+    ([, { addresses }]) =>
       addresses[HUB_POOL_CHAIN_ID]?.toLowerCase() ===
       tokenAddress.toLowerCase(),
   )?.[0];
@@ -1161,7 +1161,7 @@ async function getBalancerPoolState(poolTokenAddress: string) {
   const poolEntry = Object.entries(
     supportedBalancerPoolsMap[HUB_POOL_CHAIN_ID],
   ).find(
-    ([_, { address }]) =>
+    ([, { address }]) =>
       address.toLowerCase() === poolTokenAddress.toLowerCase(),
   );
 

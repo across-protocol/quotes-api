@@ -9,7 +9,7 @@ import {
 } from "./_utils";
 import { ENABLED_POOLS_UNDERLYING_TOKENS } from "./_constants";
 
-const handler = async (_: Request<{}>, response: Response) => {
+const handler = async (_: Request, response: Response) => {
   const logger = getLogger();
   logger.debug({
     at: "PoolsList",
