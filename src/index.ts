@@ -1,7 +1,8 @@
+import express from "express";
+
 import dotenv from "dotenv";
 
 // import handlers
-
 import accountBalanceHandler from "./api/account-balance";
 import availableRoutesHandler from "./api/available-routes";
 import buildDepositTxHandler from "./api/build-deposit-tx";
