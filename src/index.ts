@@ -27,6 +27,9 @@ app.get("/api/pools-list", poolsListHandler);
 app.get("/api/pools", poolsHandler);
 app.get("/api/suggested-fees", suggestedFeesHandler);
 app.get("/api/token-list", tokenListHandler);
+app.get("/health", (_, res) => {
+  res.status(200).send("OK");
+});
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
