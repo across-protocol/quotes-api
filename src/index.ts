@@ -13,6 +13,12 @@ import poolsHandler from "./api/pools";
 import suggestedFeesHandler from "./api/suggested-fees";
 import tokenListHandler from "./api/token-list";
 
+// Log and ignore unhandled promise rejections.
+process.on("unhandledRejection", (reason, promise) => {
+  console.log("Unhandled Rejection at:", promise, "reason:", reason);
+  // Application specific logging, throwing an error, or other logic here
+});
+
 dotenv.config();
 
 const app = express();
