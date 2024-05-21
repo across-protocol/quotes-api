@@ -36,9 +36,6 @@ app.get("/api/token-list", tokenListHandler);
 app.get("/health", (_, res) => {
   res.status(200).send("OK");
 });
-app.get("/loaderio-1782387504fc19a1272e09e91ebc0c06", (_, res) => {
-  res.status(200).send("loaderio-1782387504fc19a1272e09e91ebc0c06");
-});
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

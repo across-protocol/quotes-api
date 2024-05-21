@@ -6,8 +6,10 @@ type RedisClient = ReturnType<typeof createClient>;
 
 export class LocalCache extends Cache {
   cache: Record<string, { value: string; expiry: number }> = {};
+  keyCount
 
   async set(key: string, value: string, ttl?: number): Promise<void> {
+    if (this.cache.l)
     this.cache[key] = {
       value,
       expiry: ttl
