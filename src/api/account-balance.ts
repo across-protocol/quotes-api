@@ -18,6 +18,7 @@ type AccountBalanceQueryParams = Infer<typeof AccountBalanceQueryParamsSchema>;
 const handler = async (
   { query }: Request<AccountBalanceQueryParams>,
   response: Response,
+  next: () => void,
 ) => {
   const logger = getLogger();
   logger.debug({
@@ -44,13 +45,18 @@ const handler = async (
       message: "Response data",
       responseJson: result,
     });
-    // Set the caching headers that will be used by the CDN.
-    response.setHeader(
-      "Cache-Control",
-      "s-maxage=150, stale-while-revalidate=150",
-    );
-    // Return the response
-    response.status(200).json(result);
+
+    if (!response.locals.responseSent) {
+      // Set the caching headers that will be used by the CDN.
+      response.setHeader(
+        "Cache-Control",
+        "s-maxage=150, stale-while-revalidate=150",
+      );
+      // Return the response
+      response.status(200).json(result);
+    }
+    response.locals.responseJson = result;
+    next();
   } catch (error: unknown) {
     return handleErrorCondition("account-balance", response, logger, error);
   }

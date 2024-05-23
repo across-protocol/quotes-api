@@ -4,7 +4,7 @@ import { Cache } from "./cache";
 
 type RedisClient = ReturnType<typeof createClient>;
 
-export class Redis extends Cache {
+export class Redis implements Cache {
   static instance: Promise<Redis> | undefined;
 
   private static async create(): Promise<Redis> {
@@ -21,9 +21,7 @@ export class Redis extends Cache {
     return this.instance;
   }
 
-  private constructor(readonly client: RedisClient) {
-    super();
-  }
+  private constructor(readonly client: RedisClient) {}
 
   async set(key: string, value: string, ttl?: number) {
     await this.client.set(

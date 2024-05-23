@@ -1,21 +1,21 @@
-import { createClient } from "redis";
-
 import { Cache } from "./cache";
 
-type RedisClient = ReturnType<typeof createClient>;
+const KEY_THRESHOLD = 10000;
+const KEY_TARGET = 1000;
 
-export class LocalCache extends Cache {
-  cache: Record<string, { value: string; expiry: number }> = {};
-  keyCount
+export class LocalCache implements Cache {
+  cache: Map<string, { value: string; expiry: number }> = new Map();
 
   async set(key: string, value: string, ttl?: number): Promise<void> {
-    if (this.cache.l)
     this.cache[key] = {
       value,
       expiry: ttl
         ? Math.round(Date.now() / 1000) + ttl
         : Number.MAX_SAFE_INTEGER,
     };
+    if (this.cache.size >= KEY_THRESHOLD) {
+      this.prune();
+    }
   }
 
   async get(
@@ -26,6 +26,19 @@ export class LocalCache extends Cache {
       return { value: entry.value, expiry: entry.expiry };
     } else {
       delete this.cache[key];
+    }
+  }
+
+  // Removes enough keys to get down to the target size.
+  // Simple algorithm to just remove the first n keys, which are the oldest elements of the cache.
+  prune() {
+    const keysToRemove = this.cache.size - KEY_TARGET;
+    let removed = 0;
+    for (const key of this.cache.keys()) {
+      this.cache.delete(key);
+      if (removed++ >= keysToRemove) {
+        break;
+      }
     }
   }
 }

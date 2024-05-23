@@ -12,6 +12,7 @@ import poolsListHandler from "./api/pools-list";
 import poolsHandler from "./api/pools";
 import suggestedFeesHandler from "./api/suggested-fees";
 import tokenListHandler from "./api/token-list";
+import { LocalCache, Redis, checkCacheHandler, setCacheHandler } from "./cache";
 
 // Log and ignore unhandled promise rejections.
 process.on("unhandledRejection", (reason, promise) => {
@@ -24,19 +25,40 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.get("/api/account-balance", accountBalanceHandler);
-app.get("/api/available-routes", availableRoutesHandler);
-app.get("/api/build-deposit-tx", buildDepositTxHandler);
-app.get("/api/coingecko", coingeckoHandler);
-app.get("/api/limits", limitsHandler);
-app.get("/api/pools-list", poolsListHandler);
-app.get("/api/pools", poolsHandler);
-app.get("/api/suggested-fees", suggestedFeesHandler);
-app.get("/api/token-list", tokenListHandler);
-app.get("/health", (_, res) => {
-  res.status(200).send("OK");
-});
+async function main() {
+  const caches = [new LocalCache(), await Redis.get()];
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+  app.get(
+    "/api/account-balance",
+    checkCacheHandler(150, caches),
+    accountBalanceHandler,
+    setCacheHandler(150, 150, caches),
+  );
+  app.get("/api/available-routes", availableRoutesHandler);
+  app.get("/api/build-deposit-tx", buildDepositTxHandler);
+  app.get(
+    "/api/coingecko",
+    checkCacheHandler(150, caches),
+    coingeckoHandler,
+    setCacheHandler(150, 150, caches),
+  );
+  app.get(
+    "/api/limits",
+    checkCacheHandler(60, caches),
+    limitsHandler,
+    setCacheHandler(240, 60, caches),
+  );
+  app.get("/api/pools-list", poolsListHandler);
+  app.get("/api/pools", poolsHandler);
+  app.get("/api/suggested-fees", suggestedFeesHandler);
+  app.get("/api/token-list", tokenListHandler);
+  app.get("/health", (_, res) => {
+    res.status(200).send("OK");
+  });
+
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+  });
+}
+
+main();

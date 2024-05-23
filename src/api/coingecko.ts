@@ -115,6 +115,7 @@ type CoingeckoQueryParams = Infer<typeof CoingeckoQueryParamsSchema>;
 const handler = async (
   { query }: Request<CoingeckoQueryParams>,
   response: Response,
+  next: () => void,
 ) => {
   const logger = getLogger();
   logger.debug({
@@ -249,11 +250,15 @@ const handler = async (
       message: "Response data",
       responseJson: { price },
     });
-    response.setHeader(
-      "Cache-Control",
-      "s-maxage=150, stale-while-revalidate=150",
-    );
-    response.status(200).json({ price });
+    if (!response.locals.responseSent) {
+      response.setHeader(
+        "Cache-Control",
+        "s-maxage=150, stale-while-revalidate=150",
+      );
+      response.status(200).json({ price });
+    }
+    response.locals.responseJson = { price };
+    next();
   } catch (error: unknown) {
     return handleErrorCondition("coingecko", response, logger, error);
   }
