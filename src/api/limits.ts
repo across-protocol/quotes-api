@@ -39,6 +39,7 @@ type LimitsQueryParams = Infer<typeof LimitsQueryParamsSchema>;
 const handler = async (
   { query }: Request<LimitsQueryParams>,
   response: Response,
+  next: () => void,
 ) => {
   const logger = getLogger();
   logger.debug({
@@ -194,9 +195,13 @@ const handler = async (
       message: "Response data",
       responseJson,
     });
-    // Respond with a 200 status code and 4 minutes of cache cache with
-    // a minute of stale-while-revalidate.
-    sendResponse(response, responseJson, 200, 240, 60);
+    if (!response.locals.responseSent) {
+      // Respond with a 200 status code and 4 minutes of cache cache with
+      // a minute of stale-while-revalidate.
+      sendResponse(response, responseJson, 200, 240, 60);
+    }
+    response.locals.responseJson = responseJson;
+    next();
   } catch (error: unknown) {
     return handleErrorCondition("limits", response, logger, error);
   }
