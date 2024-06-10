@@ -12,7 +12,7 @@ import poolsListHandler from "./api/pools-list";
 import poolsHandler from "./api/pools";
 import suggestedFeesHandler from "./api/suggested-fees";
 import tokenListHandler from "./api/token-list";
-import { LocalCache, Redis, checkCacheHandler, setCacheHandler } from "./cache";
+import { Redis, checkCacheHandler, setCacheHandler } from "./cache";
 
 // Log and ignore unhandled promise rejections.
 process.on("unhandledRejection", (reason, promise) => {
@@ -26,27 +26,27 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 async function main() {
-  const caches = [new LocalCache(), await Redis.get()];
+  const cache = await Redis.get();
 
   app.get(
     "/api/account-balance",
-    checkCacheHandler(150, caches),
+    checkCacheHandler(150, cache),
     accountBalanceHandler,
-    setCacheHandler(150, 150, caches),
+    setCacheHandler(150, 150, cache),
   );
   app.get("/api/available-routes", availableRoutesHandler);
   app.get("/api/build-deposit-tx", buildDepositTxHandler);
   app.get(
     "/api/coingecko",
-    checkCacheHandler(150, caches),
+    checkCacheHandler(150, cache),
     coingeckoHandler,
-    setCacheHandler(150, 150, caches),
+    setCacheHandler(150, 150, cache),
   );
   app.get(
     "/api/limits",
-    checkCacheHandler(60, caches),
+    checkCacheHandler(60, cache),
     limitsHandler,
-    setCacheHandler(240, 60, caches),
+    setCacheHandler(240, 60, cache),
   );
   app.get("/api/pools-list", poolsListHandler);
   app.get("/api/pools", poolsHandler);
