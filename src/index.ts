@@ -12,7 +12,9 @@ import poolsListHandler from "./api/pools-list";
 import poolsHandler from "./api/pools";
 import suggestedFeesHandler from "./api/suggested-fees";
 import tokenListHandler from "./api/token-list";
+
 import { Redis, checkCacheHandler, setCacheHandler } from "./cache";
+import { initTracing } from "./lib/tracing";
 
 // Log and ignore unhandled promise rejections.
 process.on("unhandledRejection", (reason, promise) => {
@@ -24,6 +26,10 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+if (process.env.DISABLE_TRACING !== "true") {
+  initTracing();
+}
 
 async function main() {
   const cache = await Redis.get();
