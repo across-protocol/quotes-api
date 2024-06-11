@@ -11,7 +11,10 @@ function cacheKey(req: Request): string {
   });
 }
 
-export function checkCacheHandler(staleWhileRevalidate: number, cache: Cache) {
+export function checkReqCacheHandler(
+  staleWhileRevalidate: number,
+  cache: Cache,
+) {
   return async function (req: Request, res: Response, next: () => void) {
     const key = cacheKey(req);
     const currentTime = Math.round(Date.now() / 1000);
@@ -43,7 +46,7 @@ export function checkCacheHandler(staleWhileRevalidate: number, cache: Cache) {
   };
 }
 
-export function setCacheHandler(
+export function setReqCacheHandler(
   maxAge: number,
   staleWhileRevalidate: number,
   cache: Cache,
