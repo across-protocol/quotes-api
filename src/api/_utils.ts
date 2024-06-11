@@ -202,7 +202,7 @@ export const resolveVercelEndpoint = () => {
       return `https://${url}`;
     case "development":
     default:
-      return `http://127.0.0.1:${process.env.PORT}`;
+      return `http://127.0.0.1:${process.env.PORT || 3000}`;
   }
 };
 

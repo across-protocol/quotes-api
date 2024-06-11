@@ -18,9 +18,15 @@ export function checkCacheHandler(staleWhileRevalidate: number, cache: Cache) {
     const cachedValue = await cache.get(key);
 
     // If we didn't find a cached value or the value is expired, we have to process normally.
-    if (cachedValue === undefined) next();
+    if (cachedValue === undefined) {
+      next();
+      return;
+    }
     const timeRemaining = cachedValue.expiry - currentTime;
-    if (timeRemaining < 0) next();
+    if (timeRemaining < 0) {
+      next();
+      return;
+    }
 
     // In staleWhileRevalidate, we send the cached value, set responseSent to true
     // so that the later middlewares know that the response has already been sent.
