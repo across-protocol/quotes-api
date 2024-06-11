@@ -11,7 +11,6 @@ import {
   InputError,
   getProvider,
   getRelayerFeeDetails,
-  getCachedTokenPrice,
   handleErrorCondition,
   parsableBigNumberString,
   validAddress,
@@ -26,6 +25,16 @@ import {
   callViaMulticall3,
   validateChainAndTokenParams,
 } from "./_utils";
+
+import {
+  getCachedTokenPriceOrFetchFromSelf,
+  getTokenPriceCacheKey,
+} from "../prices/cache";
+import {
+  getCachedLatestMainnetBlock,
+  getLatestMainnetBlockCacheKey,
+} from "../fees/cache";
+import { Redis } from "../cache";
 
 const SuggestedFeesQueryParamsSchema = type({
   amount: parsableBigNumberString(),
@@ -58,6 +67,7 @@ const handler = async (
 
     const provider = getProvider(HUB_POOL_CHAIN_ID);
     const hubPool = getHubPool(provider);
+    const cache = await Redis.get();
 
     assert(query, SuggestedFeesQueryParamsSchema);
 
@@ -113,7 +123,17 @@ const handler = async (
       }
     }
 
-    const latestBlock = await provider.getBlock("latest");
+    // Get the latest block number and timestamp for the hub pool chain.
+    const latestBlock = await getCachedLatestMainnetBlock(
+      {
+        provider,
+      },
+      cache,
+      getLatestMainnetBlockCacheKey({
+        hubPoolChainId: String(HUB_POOL_CHAIN_ID),
+      }),
+      15,
+    );
 
     // The actual `quoteTimestamp` will be derived from the `quoteBlockNumber` below. If the caller supplies a timestamp,
     // we use the method `BlockFinder.getBlockForTimestamp` to find the block number for that timestamp. If the caller does
@@ -151,7 +171,9 @@ const handler = async (
         throw new InputError("Invalid quote timestamp");
       }
 
-      const blockFinder = new sdk.utils.BlockFinder(provider, [latestBlock]);
+      const blockFinder = new sdk.utils.BlockFinder(provider, [
+        latestBlock as ethers.providers.Block,
+      ]);
       const { number: blockNumberForTimestamp } =
         await blockFinder.getBlockForTimestamp(parsedTimestamp);
       quoteBlockNumber = blockNumberForTimestamp;
@@ -193,7 +215,18 @@ const handler = async (
     const [[currentUt, nextUt, quoteTimestamp, rawL1TokenConfig], tokenPrice] =
       await Promise.all([
         callViaMulticall3(provider, multiCalls, { blockTag: quoteBlockNumber }),
-        getCachedTokenPrice(l1Token.address, baseCurrency),
+        getCachedTokenPriceOrFetchFromSelf(
+          {
+            l1Token: l1Token.address,
+            baseCurrency,
+          },
+          cache,
+          getTokenPriceCacheKey({
+            l1TokenAddress: l1Token.address,
+            baseCurrency,
+          }),
+          60,
+        ),
       ]);
     const parsedL1TokenConfig =
       sdk.contracts.acrossConfigStore.Client.parseL1TokenConfig(

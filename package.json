@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@across-protocol/constants-v2": "^1.0.24",
-    "@across-protocol/sdk-v2": "^0.23.10",
+    "@across-protocol/sdk-v2": "^0.24.4",
     "@balancer-labs/sdk": "^1.1.5",
     "@google-cloud/logging": "^11.0.0",
     "@google-cloud/opentelemetry-cloud-trace-exporter": "^2.2.0",
