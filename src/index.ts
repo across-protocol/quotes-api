@@ -1,6 +1,14 @@
-import express from "express";
-
 import dotenv from "dotenv";
+dotenv.config();
+
+import { initTracing } from "./lib/tracing";
+
+// Need to import this before anything else to ensure that tracing is initialized
+if (process.env.DISABLE_TRACING !== "true") {
+  initTracing();
+}
+
+import express from "express";
 
 // import handlers
 import accountBalanceHandler from "./api/account-balance";
@@ -14,7 +22,6 @@ import suggestedFeesHandler from "./api/suggested-fees";
 import tokenListHandler from "./api/token-list";
 
 import { Redis, checkCacheHandler, setCacheHandler } from "./cache";
-import { initTracing } from "./lib/tracing";
 
 // Log and ignore unhandled promise rejections.
 process.on("unhandledRejection", (reason, promise) => {
@@ -22,14 +29,8 @@ process.on("unhandledRejection", (reason, promise) => {
   // Application specific logging, throwing an error, or other logic here
 });
 
-dotenv.config();
-
 const app = express();
 const port = process.env.PORT || 3000;
-
-if (process.env.DISABLE_TRACING !== "true") {
-  initTracing();
-}
 
 async function main() {
   const cache = await Redis.get();
