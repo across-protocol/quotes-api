@@ -1,4 +1,4 @@
-import * as sdk from "@across-protocol/sdk-v2";
+import * as sdk from "@across-protocol/sdk";
 import { Request, Response } from "express";
 import { ethers } from "ethers";
 import { type, assert, Infer, optional, string } from "superstruct";
