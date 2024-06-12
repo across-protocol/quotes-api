@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ethers } from "ethers";
 import { object, assert, Infer, optional, string } from "superstruct";
-import { coingecko } from "@across-protocol/sdk-v2";
+import { coingecko } from "@across-protocol/sdk";
 
 import { getLogger, handleErrorCondition, validAddress } from "./_utils";
 import {

@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { coingecko } from "@across-protocol/sdk-v2";
+import { coingecko } from "@across-protocol/sdk";
 
 import { InputError, getBalancerV2TokenPrice } from "../api/_utils";
 import {
